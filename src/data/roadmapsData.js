@@ -1,0 +1,53 @@
+
+export const initialRoadmaps = [
+  {
+    id: 'frontend',
+    title: 'Frontend Development',
+    category: 'Engineering',
+    description: 'Step-by-step guide to modern frontend development in 2026.',
+    difficulty: 'Beginner',
+    progress: 75,
+    nodesCount: 18,
+    completedNodes: 13,
+  },
+  {
+    id: 'backend',
+    title: 'Backend Development',
+    category: 'Engineering',
+    description: 'Learn server-side architecture, databases, APIs, and microservices.',
+    difficulty: 'Intermediate',
+    progress: 30,
+    nodesCount: 22,
+    completedNodes: 7,
+  },
+  {
+    id: 'fullstack',
+    title: 'Full Stack Engineer',
+    category: 'Engineering',
+    description: 'Comprehensive mastery of both frontend and backend ecosystems.',
+    difficulty: 'Advanced',
+    progress: 45,
+    nodesCount: 35,
+    completedNodes: 16,
+  },
+  {
+    id: 'ai-ml',
+    title: 'AI & Machine Learning',
+    category: 'Artificial Intelligence',
+    description: 'Neural networks, LLM integration, PyTorch, and generative models.',
+    difficulty: 'Advanced',
+    progress: 15,
+    nodesCount: 20,
+    completedNodes: 3,
+  },
+  {
+    id: 'devops',
+    title: 'DevOps & Cloud Engineering',
+    category: 'Infrastructure',
+    description: 'Docker, Kubernetes, CI/CD pipelines, AWS, and Terraform.',
+    difficulty: 'Intermediate',
+    progress: 50,
+    nodesCount: 16,
+    completedNodes: 8,
+  }
+];
