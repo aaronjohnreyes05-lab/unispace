@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Map,
@@ -18,7 +18,27 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const Sidebar = () => {
-  const { sidebarCollapsed, setSidebarCollapsed, favorites } = useApp();
+  const {
+    user,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    favorites
+  } = useApp();
+
+  const navigate = useNavigate();
+  const [avatarError, setAvatarError] = useState(false);
+
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    user?.name || 'User'
+  )}&background=1e293b&color=fff`;
+
+  const avatarSource = avatarError
+    ? fallbackAvatar
+    : user?.avatar || fallbackAvatar;
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.avatar]);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -79,7 +99,7 @@ export const Sidebar = () => {
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto overflow-x-hidden">
+      <div className="flex-1 min-h-0 py-3 px-3 space-y-1.5 overflow-y-auto overflow-x-hidden">
 
         <div className={`px-3 py-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider transition-all duration-200 ${sidebarCollapsed ? 'text-center' : ''}`}>
           {sidebarCollapsed ? 'Menu' : 'Core Modules'}
@@ -183,8 +203,47 @@ export const Sidebar = () => {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-slate-800 space-y-2 shrink-0">
+     <div className="px-3 pt-3 pb-12 border-t border-slate-800 space-y-2 shrink-0">
 
+        {/* Sidebar Profile */}
+        <button
+          onClick={() => navigate('/settings')}
+          title="Open profile settings"
+          aria-label={`Open profile settings for ${user?.name || 'User'}`}
+          className={`
+            w-full flex items-center gap-3 p-2 rounded-xl
+            border border-transparent
+            hover:bg-slate-800/70 hover:border-emerald-500/20
+            transition-all duration-200 group
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50
+            ${sidebarCollapsed ? 'justify-center' : ''}
+          `}
+        >
+          <div className="relative shrink-0">
+            <img
+              src={avatarSource}
+              alt={`${user?.name || 'User'}'s profile`}
+              onError={() => setAvatarError(true)}
+              className="w-10 h-10 rounded-full object-cover border border-slate-700 group-hover:border-emerald-400 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-emerald-500/20 transition-all duration-300"
+            />
+
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-900" />
+          </div>
+
+          {!sidebarCollapsed && (
+            <div className="min-w-0 flex-1 text-left animate-in fade-in duration-200">
+              <span className="block text-xs font-semibold text-slate-200 truncate group-hover:text-emerald-400 transition-colors">
+                {user?.name || 'User'}
+              </span>
+
+              <span className="block text-[10px] text-slate-500 truncate">
+                {user?.role || 'Workspace Member'}
+              </span>
+            </div>
+          )}
+        </button>
+
+        {/* Settings */}
         <NavLink
           to="/settings"
           className={({ isActive }) => `
@@ -202,6 +261,7 @@ export const Sidebar = () => {
           {!sidebarCollapsed && <span>Settings</span>}
         </NavLink>
 
+        {/* Local Storage Status */}
         {!sidebarCollapsed && (
           <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/60 text-xs text-slate-400 space-y-1 transition-colors duration-200 hover:border-slate-700 animate-in fade-in duration-200">
             <div className="flex justify-between font-medium">
