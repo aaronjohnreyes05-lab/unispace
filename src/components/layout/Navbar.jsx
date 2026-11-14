@@ -23,12 +23,26 @@ export const Navbar = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const searchInputRef = useRef(null);
 
   const isCurrentFavorite = favorites.includes(location.pathname);
 
-  // Searchable workspace modules
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    user.name || 'User'
+  )}&background=1e293b&color=fff`;
+
+  const avatarSource = avatarError
+    ? fallbackAvatar
+    : user.avatar || fallbackAvatar;
+
+  // Reset image fallback when the user's avatar changes.
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user.avatar]);
+
+  // Searchable workspace modules.
   const searchResults = [
     { title: 'Dashboard', path: '/dashboard', category: 'Navigation' },
     { title: 'Roadmap Studio', path: '/roadmaps', category: 'Learning' },
@@ -42,7 +56,7 @@ export const Navbar = () => {
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Keyboard shortcuts: Ctrl/Cmd + K and Escape
+  // Keyboard shortcuts: Ctrl/Cmd + K and Escape.
   useEffect(() => {
     const handleKeyDown = (event) => {
       const isSearchShortcut =
@@ -68,7 +82,7 @@ export const Navbar = () => {
     };
   }, []);
 
-  // Focus search input when modal opens
+  // Focus search input when modal opens.
   useEffect(() => {
     if (showSearchModal) {
       requestAnimationFrame(() => {
@@ -77,7 +91,7 @@ export const Navbar = () => {
     }
   }, [showSearchModal]);
 
-  // Logout
+  // Logout.
   const handleLogout = async () => {
     if (loggingOut) return;
 
@@ -129,7 +143,7 @@ export const Navbar = () => {
           </button>
         </div>
 
-        {/* Right: Actions, Notifications, Profile and Logout */}
+        {/* Right: Actions */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
 
           {/* Favorites */}
@@ -224,17 +238,23 @@ export const Navbar = () => {
           {/* User Profile */}
           <button
             onClick={() => navigate('/settings')}
-            className="flex items-center gap-2 sm:gap-3 pl-2 border-l border-slate-800 cursor-pointer group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 rounded-lg"
+            aria-label={`Open profile settings for ${user.name}`}
+            className="flex items-center gap-2 sm:gap-3 pl-2 border-l border-slate-800 cursor-pointer group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 rounded-lg"
             title="Open profile settings"
           >
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-9 h-9 rounded-xl object-cover border border-slate-700 group-hover:border-indigo-500 group-hover:scale-105 transition-all duration-200"
-            />
+            <div className="relative shrink-0">
+              <img
+                src={avatarSource}
+                alt={`${user.name}'s profile`}
+                onError={() => setAvatarError(true)}
+                className="w-9 h-9 rounded-full object-cover border border-slate-700 group-hover:border-emerald-400 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-emerald-500/20 transition-all duration-300"
+              />
+
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-900" />
+            </div>
 
             <div className="hidden md:block">
-              <span className="block text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors duration-200">
+              <span className="block text-xs font-semibold text-slate-200 group-hover:text-emerald-400 transition-colors duration-200">
                 {user.name}
               </span>
 
@@ -255,7 +275,7 @@ export const Navbar = () => {
             <LogOut
               size={18}
               className={`transition-transform duration-200 ${
-                loggingOut ? 'animate-pulse' : 'group-hover:translate-x-0.5'
+                loggingOut ? 'animate-pulse' : ''
               }`}
             />
           </button>
