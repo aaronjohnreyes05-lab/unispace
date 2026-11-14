@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { CheckSquare, Clock, Plus, Trash2, Play, Pause, RotateCcw, Calendar, CheckCircle2, Circle } from 'lucide-react';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const Productivity = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' | 'pomodoro' | 'kanban'
   const [toast, setToast] = useState(null);
 
   // 1. Tasks State
   const [tasks, setTasks] = useState(() => {
     try {
-      const saved = localStorage.getItem('unispace_tasks');
+      const saved = getUserItem(userId, 'tasks');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -34,7 +38,7 @@ export const Productivity = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('unispace_tasks', JSON.stringify(tasks));
+      setUserItem(userId, 'tasks', JSON.stringify(tasks));
     } catch (e) {
       console.error('Failed to save tasks', e);
     }

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Trash2, Search, Clock, Folder, Edit3, Download, Sparkles } from 'lucide-react';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const Documents = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [documents, setDocuments] = useState(() => {
     try {
-      const saved = localStorage.getItem('unispace_documents');
+      const saved = getUserItem(userId, 'documents');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -39,7 +43,7 @@ export const Documents = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('unispace_documents', JSON.stringify(documents));
+      setUserItem(userId, 'documents', JSON.stringify(documents));
     } catch (e) {
       console.error('Failed to save documents', e);
     }

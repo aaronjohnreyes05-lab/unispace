@@ -3,10 +3,14 @@ import { Map, Search, Sparkles, CheckCircle2, Clock, BookOpen, ArrowRight, Plus 
 import { initialRoadmaps } from '../data/roadmapsData';
 import { RoadmapDetailModal } from '../modules/roadmaps/RoadmapDetailModal';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const Roadmaps = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [roadmaps, setRoadmaps] = useState(() => {
-    const saved = localStorage.getItem('unispace_roadmaps');
+    const saved = getUserItem(userId, 'roadmaps');
     if (saved) return JSON.parse(saved);
     
     // Detailed node lists for roadmaps
@@ -26,7 +30,7 @@ export const Roadmaps = () => {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('unispace_roadmaps', JSON.stringify(roadmaps));
+    setUserItem(userId, 'roadmaps', JSON.stringify(roadmaps));
   }, [roadmaps]);
 
   const handleUpdateProgress = (roadmapId, newProgress, completedList) => {

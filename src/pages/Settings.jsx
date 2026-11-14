@@ -1,5 +1,11 @@
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useEffect
+} from 'react';
+
 import {
   Settings as SettingsIcon,
   User,
@@ -7,24 +13,31 @@ import {
   Palette,
   Download,
   Upload,
-  Trash2
+  Trash2,
+  Save,
+  Loader2
 } from 'lucide-react';
+
 import { useApp } from '../context/AppContext';
 import { Toast } from '../components/common/Toast';
 
 export const Settings = () => {
   const {
     user,
-    setUser,
     accentColor,
     setAccentColor,
     exportData,
     importData,
-    clearAllData
+    clearAllData,
+    updateProfile
   } = useApp();
 
   const fileInputRef = useRef(null);
+
   const [toast, setToast] = useState(null);
+  const [displayName, setDisplayName] = useState(user.name || '');
+  const [role, setRole] = useState(user.role || '');
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const showToast = useCallback((type, message) => {
     setToast({ type, message });
@@ -34,6 +47,49 @@ export const Settings = () => {
     setToast(null);
   }, []);
 
+  // Keep the form synchronized with the authenticated profile.
+  useEffect(() => {
+    setDisplayName(user.name || '');
+    setRole(user.role || '');
+  }, [user.name, user.role]);
+
+  // Save profile information to Supabase.
+  const handleSaveProfile = async () => {
+    const trimmedName = displayName.trim();
+    const trimmedRole = role.trim();
+
+    if (trimmedName.length < 2) {
+      showToast('error', 'Display name must contain at least 2 characters.');
+      return;
+    }
+
+    if (!trimmedRole) {
+      showToast('error', 'Please enter your role or occupation.');
+      return;
+    }
+
+    try {
+      setSavingProfile(true);
+
+      await updateProfile({
+        name: trimmedName,
+        role: trimmedRole
+      });
+
+      showToast('success', 'Your profile has been updated successfully.');
+    } catch (error) {
+      console.error('Profile update error:', error);
+
+      showToast(
+        'error',
+        error.message || 'Unable to update your profile.'
+      );
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  // Import an existing JSON backup.
   const handleImport = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -82,13 +138,6 @@ export const Settings = () => {
     event.target.value = '';
   };
 
-  const updateUser = (field, value) => {
-    setUser(previous => ({
-      ...previous,
-      [field]: value
-    }));
-  };
-
   const handleExport = () => {
     exportData();
     showToast('success', 'Backup export started.');
@@ -117,48 +166,88 @@ export const Settings = () => {
 
       {/* Profile Settings */}
       <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+
         <div className="flex items-center gap-3">
           <User className="text-indigo-400" size={20} />
           <h2 className="font-semibold text-white">Profile Settings</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
           <div>
             <label className={labelClass}>Display Name</label>
+
             <input
               className={inputClass}
-              value={user.name || ''}
-              onChange={event => updateUser('name', event.target.value)}
+              value={displayName}
+              onChange={event => setDisplayName(event.target.value)}
+              placeholder="Enter your display name"
+              maxLength={80}
+              disabled={savingProfile}
             />
           </div>
 
           <div>
             <label className={labelClass}>Email Address</label>
+
             <input
               type="email"
-              className={inputClass}
+              className={`${inputClass} opacity-60 cursor-not-allowed`}
               value={user.email || ''}
-              onChange={event => updateUser('email', event.target.value)}
+              readOnly
+              disabled
             />
+
+            <p className="text-[11px] text-slate-500 mt-2">
+              Your email is managed by Supabase authentication.
+            </p>
           </div>
 
           <div className="md:col-span-2">
             <label className={labelClass}>Role / Occupation</label>
+
             <input
               className={inputClass}
-              value={user.role || ''}
-              onChange={event => updateUser('role', event.target.value)}
+              value={role}
+              onChange={event => setRole(event.target.value)}
+              placeholder="Example: Student, Developer"
+              maxLength={60}
+              disabled={savingProfile}
             />
           </div>
+
         </div>
 
-        <p className="text-xs text-slate-500">
-          Profile changes are saved automatically in your browser.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-5">
+
+          <p className="text-xs text-slate-500">
+            Profile information is saved to your UniSpace account.
+          </p>
+
+          <button
+            onClick={handleSaveProfile}
+            disabled={savingProfile}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors"
+          >
+            {savingProfile ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                Save Profile
+              </>
+            )}
+          </button>
+
+        </div>
       </section>
 
       {/* Appearance */}
       <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+
         <div className="flex items-center gap-3">
           <Palette className="text-cyan-400" size={20} />
           <h2 className="font-semibold text-white">Appearance</h2>
@@ -180,14 +269,15 @@ export const Settings = () => {
           </select>
 
           <p className="text-xs text-slate-500 mt-2">
-            This preference is stored in the current application state.
-            Applying it throughout the interface will be implemented separately.
+            Accent color selection is available. Applying it consistently
+            throughout the interface will be handled in the Appearance stage.
           </p>
         </div>
       </section>
 
       {/* Data Management */}
       <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+
         <div className="flex items-center gap-3">
           <Database className="text-emerald-400" size={20} />
           <h2 className="font-semibold text-white">Data Management</h2>
@@ -199,6 +289,7 @@ export const Settings = () => {
         </p>
 
         <div className="flex flex-wrap gap-3">
+
           <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
@@ -222,10 +313,12 @@ export const Settings = () => {
             className="hidden"
             onChange={handleImport}
           />
+
         </div>
 
         {/* Danger Zone */}
         <div className="border-t border-slate-800 pt-5">
+
           <h3 className="text-sm font-semibold text-red-400 flex items-center gap-2">
             <Trash2 size={16} />
             Danger Zone
@@ -242,15 +335,18 @@ export const Settings = () => {
           >
             Clear All Workspace Data
           </button>
+
         </div>
       </section>
 
       {/* Storage Information */}
       <section className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
         <p className="text-xs text-slate-500 leading-5">
-          UniSpace currently stores supported data locally in your browser.
-          It does not provide cloud synchronization or server-side backup.
-          Clearing browser storage may permanently remove your local data.
+          UniSpace currently stores supported workspace module data locally
+          in your browser. Profile information is stored in Supabase.
+          Workspace cloud synchronization and server-side backups are not
+          yet implemented. Clearing browser storage may permanently remove
+          local workspace data.
         </p>
       </section>
 
@@ -262,6 +358,7 @@ export const Settings = () => {
           onClose={closeToast}
         />
       )}
+
     </div>
   );
 };

@@ -21,7 +21,7 @@ export const Sidebar = () => {
   const { sidebarCollapsed, setSidebarCollapsed, favorites } = useApp();
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/roadmaps', label: 'Roadmap Studio', icon: Map },
     { path: '/ai-workspace', label: 'AI Workspace', icon: Sparkles },
     { path: '/education', label: 'Education Center', icon: GraduationCap },
@@ -33,33 +33,40 @@ export const Sidebar = () => {
 
   return (
     <aside className={`bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col z-20 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+
       {/* Brand Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
-        {!sidebarCollapsed && (
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+
+        <NavLink
+          to="/dashboard"
+          className="flex items-center gap-3 min-w-0"
+          title="Go to Dashboard"
+        >
+          {!sidebarCollapsed ? (
+            <>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                <Compass className="w-5 h-5 text-white" />
+              </div>
+
+              <div>
+                <span className="font-bold text-lg tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                  UniSpace
+                </span>
+                <span className="block text-[10px] text-cyan-400 font-medium tracking-widest uppercase">
+                  Workspace OS
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="mx-auto w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Compass className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <span className="font-bold text-lg tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                UniSpace
-              </span>
-              <span className="block text-[10px] text-cyan-400 font-medium tracking-widest uppercase">
-                Workspace OS
-              </span>
-            </div>
-          </div>
-        )}
-
-        {sidebarCollapsed && (
-          <div className="mx-auto w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Compass className="w-5 h-5 text-white" />
-          </div>
-        )}
+          )}
+        </NavLink>
 
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0"
           title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {sidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -79,7 +86,7 @@ export const Sidebar = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === '/'}
+              end={item.path === '/dashboard'}
               className={({ isActive }) => `
                 flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative
                 ${isActive

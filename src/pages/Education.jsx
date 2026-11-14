@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { GraduationCap, BookOpen, Layers, CheckSquare, Plus, Trash2, Edit3, Check, X, Award, Search, ArrowRight } from 'lucide-react';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const Education = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [activeTab, setActiveTab] = useState('notes'); // 'notes' | 'flashcards' | 'quiz' | 'assignments'
   const [toast, setToast] = useState(null);
 
   // --- 1. Notes State ---
   const [notes, setNotes] = useState(() => {
-    const saved = localStorage.getItem('unispace_edu_notes');
+    const saved = getUserItem(userId, 'edu_notes');
     return saved ? JSON.parse(saved) : [
       { id: 1, title: 'Data Structures & Algorithms', category: 'CS', content: 'Key concepts: Big O notation, Hash Maps, Trees, Graph traversal (BFS/DFS).', updatedAt: 'Yesterday' }
     ];
@@ -19,7 +23,7 @@ export const Education = () => {
 
   // --- 2. Flashcards State ---
   const [flashcards, setFlashcards] = useState(() => {
-    const saved = localStorage.getItem('unispace_edu_flashcards');
+    const saved = getUserItem(userId, 'edu_flashcards');
     return saved ? JSON.parse(saved) : [
       { id: 1, question: 'What is the time complexity of binary search?', answer: 'O(log n)', status: 'mastered' },
       { id: 2, question: 'What does CSS stand for?', answer: 'Cascading Style Sheets', status: 'learning' }
@@ -58,7 +62,7 @@ export const Education = () => {
 
   // --- 4. Assignment Tracker State ---
   const [assignments, setAssignments] = useState(() => {
-    const saved = localStorage.getItem('unispace_edu_assignments');
+    const saved = getUserItem(userId, 'edu_assignments');
     return saved ? JSON.parse(saved) : [
       { id: 1, title: 'Full Stack React Project', dueDate: '2026-06-15', priority: 'High', completed: false },
       { id: 2, title: 'Database Schema Design', dueDate: '2026-06-20', priority: 'Medium', completed: true }
@@ -69,15 +73,15 @@ export const Education = () => {
   const [newAssignPriority, setNewAssignPriority] = useState('Medium');
 
   useEffect(() => {
-    localStorage.setItem('unispace_edu_notes', JSON.stringify(notes));
+    setUserItem(userId, 'edu_notes', JSON.stringify(notes));
   }, [notes]);
 
   useEffect(() => {
-    localStorage.setItem('unispace_edu_flashcards', JSON.stringify(flashcards));
+    setUserItem(userId, 'edu_flashcards', JSON.stringify(flashcards));
   }, [flashcards]);
 
   useEffect(() => {
-    localStorage.setItem('unispace_edu_assignments', JSON.stringify(assignments));
+    setUserItem(userId, 'edu_assignments', JSON.stringify(assignments));
   }, [assignments]);
 
   // Handlers

@@ -7,10 +7,14 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { getSimulatedAIResponse } from '../modules/ai/aiAssistantService';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const AIWorkspace = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [conversations, setConversations] = useState(() => {
-    const saved = localStorage.getItem('unispace_ai_conversations');
+    const saved = getUserItem(userId, 'ai_conversations');
 
     if (saved) {
       try {
@@ -42,7 +46,7 @@ export const AIWorkspace = () => {
   });
 
   const [activeConvId, setActiveConvId] = useState(() => {
-    const saved = localStorage.getItem('unispace_ai_conversations');
+    const saved = getUserItem(userId, 'ai_conversations');
 
     if (saved) {
       try {
@@ -64,8 +68,7 @@ export const AIWorkspace = () => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem(
-      'unispace_ai_conversations',
+    setUserItem(userId, 'ai_conversations',
       JSON.stringify(conversations)
     );
   }, [conversations]);
@@ -361,3 +364,6 @@ export const AIWorkspace = () => {
     </div>
   );
 };
+
+
+

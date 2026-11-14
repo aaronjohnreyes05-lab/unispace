@@ -5,8 +5,12 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Toast } from '../components/common/Toast';
+import { useAuth } from '../context/AuthContext';
+import { getUserItem, setUserItem } from '../lib/userStorage';
 
 export const DeveloperTools = () => {
+  const { user } = useAuth();
+  const userId = user.id;
   const [activeTab, setActiveTab] = useState('playground');
   const [toast, setToast] = useState(null);
 
@@ -36,7 +40,7 @@ export const DeveloperTools = () => {
   // 5. Code Snippet Manager State
   const [snippets, setSnippets] = useState(() => {
     try {
-      const saved = localStorage.getItem('unispace_dev_snippets');
+      const saved = getUserItem(userId, 'dev_snippets');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -70,7 +74,7 @@ export const DeveloperTools = () => {
   // Persist snippets safely
   useEffect(() => {
     try {
-      localStorage.setItem('unispace_dev_snippets', JSON.stringify(snippets));
+      setUserItem(userId, 'dev_snippets', JSON.stringify(snippets));
     } catch (e) {
       console.error('Failed to save snippets', e);
     }
