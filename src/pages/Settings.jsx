@@ -10,7 +10,6 @@ import {
   Settings as SettingsIcon,
   User,
   Database,
-  Palette,
   Download,
   Upload,
   Trash2,
@@ -24,8 +23,6 @@ import { Toast } from '../components/common/Toast';
 export const Settings = () => {
   const {
     user,
-    accentColor,
-    setAccentColor,
     exportData,
     importData,
     clearAllData,
@@ -160,7 +157,7 @@ export const Settings = () => {
         </div>
 
         <p className="text-sm text-slate-400 mt-2">
-          Manage your profile, appearance, and locally stored workspace data.
+          Manage your profile and workspace data.
         </p>
       </div>
 
@@ -242,36 +239,6 @@ export const Settings = () => {
             )}
           </button>
 
-        </div>
-      </section>
-
-      {/* Appearance */}
-      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-
-        <div className="flex items-center gap-3">
-          <Palette className="text-cyan-400" size={20} />
-          <h2 className="font-semibold text-white">Appearance</h2>
-        </div>
-
-        <div>
-          <label className={labelClass}>Accent Color Preference</label>
-
-          <select
-            className={inputClass}
-            value={accentColor}
-            onChange={event => setAccentColor(event.target.value)}
-          >
-            <option value="indigo">Indigo</option>
-            <option value="cyan">Cyan</option>
-            <option value="emerald">Emerald</option>
-            <option value="violet">Violet</option>
-            <option value="amber">Amber</option>
-          </select>
-
-          <p className="text-xs text-slate-500 mt-2">
-            Accent color selection is available. Applying it consistently
-            throughout the interface will be handled in the Appearance stage.
-          </p>
         </div>
       </section>
 

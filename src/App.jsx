@@ -2,16 +2,22 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
+// Context providers
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
+// Authentication
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+
+// Layout
 import { AppLayout } from './components/layout/AppLayout';
 
+// Public pages
 import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 
+// Workspace pages
 import { Dashboard } from './pages/Dashboard';
 import { Roadmaps } from './pages/Roadmaps';
 import { AIWorkspace } from './pages/AIWorkspace';
@@ -29,12 +35,13 @@ function App() {
       <AppProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public pages */}
+
+            {/* Public routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* Protected workspace */}
+            {/* Protected workspace routes */}
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -49,8 +56,9 @@ function App() {
               </Route>
             </Route>
 
-            {/* Unknown pages */}
+            {/* Fallback route */}
             <Route path="*" element={<NotFound />} />
+
           </Routes>
         </BrowserRouter>
       </AppProvider>
